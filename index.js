@@ -13,6 +13,16 @@ var todoList = [
     description: "Comb your hair",
     completed: false,
   },
+  {
+    id: 3,
+    description: "Feed the cat",
+    completed: true,
+  },
+  {
+    id: 4,
+    description: "Bring Dhaniya!!",
+    completed: false,
+  },
 ];
 
 app.get("/", (req, res) => {
