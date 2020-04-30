@@ -1,7 +1,9 @@
 var express = require("express");
+var bodyparser = require("body-parser");
 var PORT = process.env.PORT || 3000;
 var app = express();
-
+app.use(bodyparser.json());
+var todoItemID = 4;
 var todoList = [
   {
     id: 1,
@@ -34,13 +36,26 @@ app.get("/todos", (req, res) => {
 });
 // get all todos by id
 app.get("/todos/:id", (req, res) => {
-  var todoId = parseInt(req.params.id,10);
+  var todoId = parseInt(req.params.id, 10);
   var matchedItem = todoList.find((el) => el.id === todoId);
   if (matchedItem) {
     res.json(matchedItem);
   } else {
     res.status(404).send();
   }
+});
+app.post("/todos", (req, res) => {
+  var body = req.body;
+  var nextID = todoItemID++;
+  todoList.push({
+    id: nextID,
+    description: body.description,
+    completed: body.completed,
+  });
+
+  insertedTodo = todoList.find((el) => el.id === nextID);
+
+  res.json(insertedTodo);
 });
 
 app.listen(PORT, () => {
