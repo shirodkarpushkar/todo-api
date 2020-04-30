@@ -1,4 +1,5 @@
 var Sequelize = require("sequelize");
+const Op = Sequelize.Op;
 var sequelize = new Sequelize(undefined, undefined, undefined, {
   dialect: "sqlite",
   storage: __dirname + "/basic-sqlite-database.sqlite",
@@ -31,7 +32,21 @@ sequelize.sync({ force: true }).then(() => {
       });
     })
     .then((todo) => {
-      console.log("completed!");
+      // return Todo.findByPk(1);
+      return Todo.findAll({
+        where: {
+          description: {
+            [Op.like]: "%tea%",
+          },
+        },
+      });
+    })
+    .then((todos) => {
+      if (todos) {
+        todos.forEach((el) => {
+          console.log(el.toJSON());
+        });
+      }
     })
     .catch((error) => {
       console.log("error", error);
