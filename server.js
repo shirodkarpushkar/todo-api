@@ -75,12 +75,14 @@ app.delete("/todos/:id", (req, res) => {
   var todoId = parseInt(req.params.id, 10);
   var matchedItem = _.findWhere(todoList, { id: todoId });
   if (matchedItem) {
-    _.without(todoList, matchedItem);
+    todoList = _.without(todoList, matchedItem);
     res.json({
       message: "Item deleted successfully!",
     });
   } else {
-    res.status(404).send();
+    res.status(404).json({
+      error:"No Item to delete"
+    });
   }
 });
 
