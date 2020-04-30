@@ -18,9 +18,19 @@ var todoList = [
 app.get("/", (req, res) => {
   res.send("Welcome to TODO LIST");
 });
-// get all todos 
+// get all todos
 app.get("/todos", (req, res) => {
   res.json(todoList);
+});
+// get all todos by id
+app.get("/todos/:id", (req, res) => {
+  var todoId = req.params.id;
+  var matchedItem = todoList.find((el) => el.id == todoId);
+  if (matchedItem) {
+    res.json(matchedItem);
+  } else {
+    res.status(404).send();
+  }
 });
 
 app.listen(PORT, () => {
