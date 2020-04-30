@@ -46,14 +46,14 @@ app.get("/todos/:id", (req, res) => {
 });
 app.post("/todos", (req, res) => {
   var body = req.body;
-  var nextID = todoItemID++;
+  todoItemID = todoItemID + 1;
   todoList.push({
-    id: nextID,
+    id: todoItemID,
     description: body.description,
     completed: body.completed,
   });
 
-  insertedTodo = todoList.find((el) => el.id === nextID);
+  insertedTodo = todoList.find((el) => el.id === todoItemID);
 
   res.json(insertedTodo);
 });
