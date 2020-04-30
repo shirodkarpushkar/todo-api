@@ -35,23 +35,29 @@ app.get("/", (req, res) => {
 // get all todos
 app.get("/todos", (req, res) => {
   var queryParams = req.query;
+  var filteredTodos = todoList;
 
   if (
     queryParams.hasOwnProperty("completed") &&
     queryParams.completed === "true"
   ) {
-    var filteredTodos = _.where(todoList, { completed: true });
-
-    return res.json(filteredTodos);
+    filteredTodos = _.where(todoList, { completed: true });
   } else if (
     queryParams.hasOwnProperty("completed") &&
     queryParams.completed === "false"
   ) {
-    var filteredTodos = _.where(todoList, { completed: false });
-
-    return res.json(filteredTodos);
+    filteredTodos = _.where(todoList, { completed: false });
   }
-  res.json(todoList);
+
+  if (
+    queryParams.hasOwnProperty("search") &&
+    queryParams.search.trim().length > 0
+  ) {
+    filteredTodos = _.filter(todoList, (el) => {
+      return el.description.toLowerCase().indexOf(queryParams.search.toLowerCase()) > -1;
+    });
+  }
+  res.json(filteredTodos);
 });
 
 // get all todos by id
