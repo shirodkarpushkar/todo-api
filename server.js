@@ -45,9 +45,10 @@ app.get("/todos/:id", (req, res) => {
     res.status(404).send();
   }
 });
+//add item to array
 app.post("/todos", (req, res) => {
   var body = _.pick(req.body, "description", "completed");
-  console.log("body", body)
+  console.log("body", body);
 
   if (
     !_.isBoolean(body.completed) ||
@@ -56,7 +57,7 @@ app.post("/todos", (req, res) => {
   ) {
     return res.status(400).send();
   }
-  body.description = body.description.trim()
+  body.description = body.description.trim();
 
   todoItemID = todoItemID + 1;
   todoList.push({
@@ -68,6 +69,19 @@ app.post("/todos", (req, res) => {
   insertedTodo = todoList.find((el) => el.id === todoItemID);
 
   res.json(insertedTodo);
+});
+
+app.delete("/todos/:id", (req, res) => {
+  var todoId = parseInt(req.params.id, 10);
+  var matchedItem = _.findWhere(todoList, { id: todoId });
+  if (matchedItem) {
+    _.without(todoList, matchedItem);
+    res.json({
+      message: "Item deleted successfully!",
+    });
+  } else {
+    res.status(404).send();
+  }
 });
 
 app.listen(PORT, () => {
