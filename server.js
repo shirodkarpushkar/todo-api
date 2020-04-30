@@ -46,7 +46,9 @@ app.get("/todos/:id", (req, res) => {
   }
 });
 app.post("/todos", (req, res) => {
-  var body = req.body;
+  var body = _.pick(req.body, "description", "completed");
+  console.log("body", body)
+
   if (
     !_.isBoolean(body.completed) ||
     !_.isString(body.description) ||
@@ -54,6 +56,7 @@ app.post("/todos", (req, res) => {
   ) {
     return res.status(400).send();
   }
+  body.description = body.description.trim()
 
   todoItemID = todoItemID + 1;
   todoList.push({
