@@ -24,8 +24,8 @@ app.get("/todos", (req, res) => {
 });
 // get all todos by id
 app.get("/todos/:id", (req, res) => {
-  var todoId = req.params.id;
-  var matchedItem = todoList.find((el) => el.id == todoId);
+  var todoId = parseInt(req.params.id,10);
+  var matchedItem = todoList.find((el) => el.id === todoId);
   if (matchedItem) {
     res.json(matchedItem);
   } else {
