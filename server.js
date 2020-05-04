@@ -97,7 +97,7 @@ app.post("/todos", (req, res) => {
       completed: body.completed,
     })
     .then((todo) => {
-      res.send('Item deleted successfully!');
+      res.json(todo);
     })
     .catch((err) => {
       res.status(400).json(err);
@@ -113,11 +113,15 @@ app.delete("/todos/:id", (req, res) => {
         id: todoId,
       },
     })
-    .then((todo) => {
-      res.json(todo);
+    .then((rowsDeleted) => {
+      if (rowsDeleted) {
+        res.json({ success: "Item deleted successfully!" });
+      } else {
+        res.status(404).json({ error: "No rows to delete" });
+      }
     })
     .catch((err) => {
-      res.status(404).json(err);
+      res.status(500).json(err);
     });
 });
 
