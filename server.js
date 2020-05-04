@@ -68,12 +68,14 @@ app.get("/todos", (req, res) => {
 // get all todos by id
 app.get("/todos/:id", (req, res) => {
   var todoId = parseInt(req.params.id, 10);
-  var matchedItem = _.findWhere(todoList, { id: todoId });
-  if (matchedItem) {
-    res.json(matchedItem);
-  } else {
-    res.status(404).send();
-  }
+  db.todo
+    .findByPk(todoId)
+    .then((todo) => {
+      res.json(todo.toJSON());
+    })
+    .catch((err) => {
+      res.status(404).json(err);
+    });
 });
 
 // add item to array
@@ -87,10 +89,10 @@ app.post("/todos", (req, res) => {
     })
     .then((todo) => {
       res.json(todo.toJSON());
-    }).catch((err) => {
-      res.status(400).json(err);
     })
-    ;
+    .catch((err) => {
+      res.status(400).json(err);
+    });
 });
 
 // add item to array
