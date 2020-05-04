@@ -90,9 +90,8 @@ app.post("/todos", (req, res) => {
   }
   body.description = body.description.trim();
 
-  todoItemID = todoItemID + 1;
-  todoList.push({
-    id: todoItemID,
+  //  todoItemID = todoItemID + 1;
+  db.todo.create({
     description: body.description,
     completed: body.completed,
   });
@@ -146,7 +145,7 @@ app.put("/todos/:id", (req, res) => {
   res.json(matchedItem);
 });
 
-db.sync().then(() => {
+db.sequelize.sync().then(() => {
   console.log("DATABASE CONNECTED:" + new Date());
   app.listen(PORT, () => {
     console.log("listening to PORT:", PORT);
