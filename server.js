@@ -97,7 +97,7 @@ app.post("/todos", (req, res) => {
       completed: body.completed,
     })
     .then((todo) => {
-      res.json(todo.toJSON());
+      res.send('Item deleted successfully!');
     })
     .catch((err) => {
       res.status(400).json(err);
@@ -107,17 +107,18 @@ app.post("/todos", (req, res) => {
 // add item to array
 app.delete("/todos/:id", (req, res) => {
   var todoId = parseInt(req.params.id, 10);
-  var matchedItem = _.findWhere(todoList, { id: todoId });
-  if (matchedItem) {
-    todoList = _.without(todoList, matchedItem);
-    res.json({
-      message: "Item deleted successfully!",
+  db.todo
+    .destroy({
+      where: {
+        id: todoId,
+      },
+    })
+    .then((todo) => {
+      res.json(todo);
+    })
+    .catch((err) => {
+      res.status(404).json(err);
     });
-  } else {
-    res.status(404).json({
-      error: "No Item to delete",
-    });
-  }
 });
 
 // put item by  id
