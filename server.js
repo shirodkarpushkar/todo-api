@@ -1,6 +1,8 @@
 var express = require("express");
 var bodyparser = require("body-parser");
 var _ = require("underscore");
+var db = require("./db");
+
 var PORT = process.env.PORT || 3000;
 var app = express();
 app.use(bodyparser.json());
@@ -54,7 +56,10 @@ app.get("/todos", (req, res) => {
     queryParams.search.trim().length > 0
   ) {
     filteredTodos = _.filter(todoList, (el) => {
-      return el.description.toLowerCase().indexOf(queryParams.search.toLowerCase()) > -1;
+      return (
+        el.description.toLowerCase().indexOf(queryParams.search.toLowerCase()) >
+        -1
+      );
     });
   }
   res.json(filteredTodos);
@@ -141,6 +146,9 @@ app.put("/todos/:id", (req, res) => {
   res.json(matchedItem);
 });
 
-app.listen(PORT, () => {
-  console.log("listening to PORT:", PORT);
+db.sync().then(() => {
+  console.log("DATABASE CONNECTED:" + new Date());
+  app.listen(PORT, () => {
+    console.log("listening to PORT:", PORT);
+  });
 });
