@@ -128,29 +128,38 @@ app.delete("/todos/:id", (req, res) => {
 // put item by  id
 app.put("/todos/:id", (req, res) => {
   var todoId = parseInt(req.params.id, 10);
-  var matchedItem = _.findWhere(todoList, { id: todoId });
   var body = _.pick(req.body, "description", "completed");
-  var validAttributes = {};
-  if (!matchedItem) {
-    return res.status(404).send();
+  var attributes = {};
+
+  if (body.hasOwnProperty("completed")) {
+    attributes.completed = body.completed;
   }
-  if (body.hasOwnProperty("completed") && _.isBoolean(body.completed)) {
-    validAttributes.completed = body.completed;
-  } else if (body.hasOwnProperty("completed")) {
-    return res.status(400).send();
+  if (body.hasOwnProperty("description")) {
+    attributes.description = body.description;
   }
-  if (
-    body.hasOwnProperty("description") &&
-    _.isString(body.description) &&
-    body.description.trim().length > 0
-  ) {
-    validAttributes.description = body.description.trim();
-  } else if (body.hasOwnProperty("description")) {
-    return res.status(400).send();
-  }
-  // finally update
-  _.extend(matchedItem, validAttributes);
-  res.json(matchedItem);
+
+  db.todo
+    .findByPk(todoId)
+    .then(
+      (todo) => {
+        if (todo) {
+          return todo.update(attributes);
+        } else {
+          res.status(404).send();
+        }
+      },
+      (err) => {
+        res.status(500).json(err);
+      }
+    )
+    .then(
+      (todo) => {
+        res.json(todo);
+      },
+      (err) => {
+        res.status(400).json(err);
+      }
+    );
 });
 
 db.sequelize.sync().then(() => {
