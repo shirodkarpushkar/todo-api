@@ -19,36 +19,14 @@ var Todo = sequelize.define("todo", {
     defaultValue: false,
   },
 });
-sequelize.sync({ force: true }).then(() => {
-  console.log("everything is synched!");
-  Todo.create({
-    description: "Make Tea",
-    completed: false,
+sequelize
+  .sync()
+  .then(() => {
+    console.log("database connected : ",new Date());
+    return Todo.findByPk(1);
+  }).then((todo) => {
+    console.log(todo.toJSON())
   })
-    .then((todo) => {
-      return Todo.create({
-        description: "Make Coffee",
-        completed: false,
-      });
-    })
-    .then((todo) => {
-      // return Todo.findByPk(1);
-      return Todo.findAll({
-        where: {
-          description: {
-            [Op.like]: "%tea%",
-          },
-        },
-      });
-    })
-    .then((todos) => {
-      if (todos) {
-        todos.forEach((el) => {
-          console.log(el.toJSON());
-        });
-      }
-    })
-    .catch((error) => {
-      console.log("error", error);
-    });
-});
+  .catch((error) => {
+    console.log("error: Todo not found");
+  });
