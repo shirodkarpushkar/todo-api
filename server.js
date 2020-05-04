@@ -37,32 +37,37 @@ app.get("/", (req, res) => {
 // get all todos
 app.get("/todos", (req, res) => {
   var queryParams = req.query;
-  var filteredTodos = todoList;
+
+  var where = {};
 
   if (
     queryParams.hasOwnProperty("completed") &&
     queryParams.completed === "true"
   ) {
-    filteredTodos = _.where(todoList, { completed: true });
+    where.completed = true;
   } else if (
     queryParams.hasOwnProperty("completed") &&
     queryParams.completed === "false"
   ) {
-    filteredTodos = _.where(todoList, { completed: false });
+    where.completed = false;
   }
 
   if (
     queryParams.hasOwnProperty("search") &&
     queryParams.search.trim().length > 0
   ) {
-    filteredTodos = _.filter(todoList, (el) => {
-      return (
-        el.description.toLowerCase().indexOf(queryParams.search.toLowerCase()) >
-        -1
-      );
-    });
+    where.description = {
+      [db.Op.like]: `%${queryParams.search}%`,
+    };
   }
-  res.json(filteredTodos);
+  db.todo
+    .findAll({ where })
+    .then((todos) => {
+      res.json(todos);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
 });
 
 // get all todos by id
@@ -71,10 +76,14 @@ app.get("/todos/:id", (req, res) => {
   db.todo
     .findByPk(todoId)
     .then((todo) => {
-      res.json(todo.toJSON());
+      if (!!todo) {
+        res.json(todo.toJSON());
+      } else {
+        res.status(404).send();
+      }
     })
     .catch((err) => {
-      res.status(404).json(err);
+      res.status(500).json(err);
     });
 });
 
