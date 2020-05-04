@@ -91,14 +91,14 @@ app.post("/todos", (req, res) => {
   body.description = body.description.trim();
 
   //  todoItemID = todoItemID + 1;
-  db.todo.create({
-    description: body.description,
-    completed: body.completed,
-  });
-
-  insertedTodo = todoList.find((el) => el.id === todoItemID);
-
-  res.json(insertedTodo);
+  db.todo
+    .create({
+      description: body.description,
+      completed: body.completed,
+    })
+    .then((todo) => {
+      res.json(todo.toJSON());
+    });
 });
 
 // add item to array
