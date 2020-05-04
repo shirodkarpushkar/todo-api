@@ -79,26 +79,18 @@ app.get("/todos/:id", (req, res) => {
 // add item to array
 app.post("/todos", (req, res) => {
   var body = _.pick(req.body, "description", "completed");
-  console.log("body", body);
 
-  if (
-    !_.isBoolean(body.completed) ||
-    !_.isString(body.description) ||
-    body.description.trim().length == 0
-  ) {
-    return res.status(400).send();
-  }
-  body.description = body.description.trim();
-
-  //  todoItemID = todoItemID + 1;
   db.todo
     .create({
-      description: body.description,
+      description: body.description.trim(),
       completed: body.completed,
     })
     .then((todo) => {
       res.json(todo.toJSON());
-    });
+    }).catch((err) => {
+      res.status(400).json(err);
+    })
+    ;
 });
 
 // add item to array
