@@ -104,6 +104,21 @@ app.post("/todos", (req, res) => {
     });
 });
 
+app.post("/users", (req, res) => {
+  var body = _.pick(req.body, "email", "password");
+  db.users
+    .create({
+      email: body.email.trim(),
+      password: body.password,
+    })
+    .then((user) => {
+      res.json(user);
+    })
+    .catch((err) => {
+      res.status(400).json(err);
+    });
+});
+
 // add item to array
 app.delete("/todos/:id", (req, res) => {
   var todoId = parseInt(req.params.id, 10);
