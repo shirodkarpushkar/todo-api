@@ -6,29 +6,7 @@ var db = require("./db");
 var PORT = process.env.PORT || 3000;
 var app = express();
 app.use(bodyparser.json());
-var todoItemID = 4;
-var todoList = [
-  {
-    id: 1,
-    description: "Bring milk as told by mom",
-    completed: false,
-  },
-  {
-    id: 2,
-    description: "Comb your hair",
-    completed: false,
-  },
-  {
-    id: 3,
-    description: "Feed the cat",
-    completed: true,
-  },
-  {
-    id: 4,
-    description: "Bring Dhaniya!!",
-    completed: false,
-  },
-];
+
 
 app.get("/", (req, res) => {
   res.send("Welcome to TODO LIST");
