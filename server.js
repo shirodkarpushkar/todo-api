@@ -107,7 +107,9 @@ app.post("/users/login", (req, res) => {
   db.users
     .authenticate(body)
     .then((user) => {
-      return res.json(user.toPublicJSON());
+      return res
+        .header("Auth", user.generateToken("Authenticated"))
+        .json(user.toPublicJSON());
     })
     .catch((err) => {
       return res.status(401).send();
@@ -172,7 +174,7 @@ app.put("/todos/:id", (req, res) => {
     );
 });
 
-db.sequelize.sync({force:true}).then(() => {
+db.sequelize.sync({ force: true }).then(() => {
   console.log("DATABASE CONNECTED:" + new Date());
   app.listen(PORT, () => {
     console.log("listening to PORT:", PORT);
