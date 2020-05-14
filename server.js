@@ -90,10 +90,12 @@ app.post("/users", (req, res) => {
       password: body.password,
     })
     .then((user) => {
-      res.json(user);
+      res.json(user.toPublicJSON());
+    }, (err) => {
+        res.status(400).json(err);
     })
     .catch((err) => {
-      res.status(400).json(err);
+      res.status(500).json(err);
     });
 });
 
@@ -155,7 +157,7 @@ app.put("/todos/:id", (req, res) => {
     );
 });
 
-db.sequelize.sync().then(() => {
+db.sequelize.sync({force:true}).then(() => {
   console.log("DATABASE CONNECTED:" + new Date());
   app.listen(PORT, () => {
     console.log("listening to PORT:", PORT);
