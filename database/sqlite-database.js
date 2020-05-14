@@ -23,7 +23,7 @@ sequelize
   .sync()
   .then(() => {
     console.log("database connected : ",new Date());
-    return Todo.findByPk(1);
+    return Todo.findById(1);
   }).then((todo) => {
     console.log(todo.toJSON())
   })
