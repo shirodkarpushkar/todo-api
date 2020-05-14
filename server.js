@@ -2,11 +2,11 @@ var express = require("express");
 var bodyparser = require("body-parser");
 var _ = require("underscore");
 var db = require("./db");
+var bcrypt = require('bcrypt')
 
 var PORT = process.env.PORT || 3000;
 var app = express();
 app.use(bodyparser.json());
-
 
 app.get("/", (req, res) => {
   res.send("Welcome to TODO LIST");
@@ -89,11 +89,39 @@ app.post("/users", (req, res) => {
       email: body.email.trim(),
       password: body.password,
     })
-    .then((user) => {
-      res.json(user.toPublicJSON());
-    }, (err) => {
+    .then(
+      (user) => {
+        res.json(user.toPublicJSON());
+      },
+      (err) => {
         res.status(400).json(err);
+      }
+    )
+    .catch((err) => {
+      res.status(500).json(err);
+    });
+});
+app.post("/users/login", (req, res) => {
+  var body = _.pick(req.body, "email", "password");
+  if (typeof body.email !== "string" || typeof body.password !== "string") {
+    return res.status(400).send();
+  }
+  db.users
+    .findOne({
+      where: {
+        email: body.email,
+      },
     })
+    .then(
+      (user) => {
+        if (!user || !bcrypt.compareSync(body.password, user.get('password_hash')) ) {
+          return res.status(401).send({
+            error:"Incorrect Id or password"
+          });
+        }
+        res.json(user.toPublicJSON());
+      }
+    )
     .catch((err) => {
       res.status(500).json(err);
     });
@@ -157,7 +185,7 @@ app.put("/todos/:id", (req, res) => {
     );
 });
 
-db.sequelize.sync({force:true}).then(() => {
+db.sequelize.sync().then(() => {
   console.log("DATABASE CONNECTED:" + new Date());
   app.listen(PORT, () => {
     console.log("listening to PORT:", PORT);
