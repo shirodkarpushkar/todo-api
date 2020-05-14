@@ -19,14 +19,21 @@ var Todo = sequelize.define("todo", {
     defaultValue: false,
   },
 });
+var users = sequelize.define("user", {
+  email: {
+    type: Sequelize.STRING,
+  },
+});
+
+Todo.belongsTo(users);
+users.hasMany(Todo);
+
 sequelize
-  .sync()
+  .sync({ force: true })
   .then(() => {
-    console.log("database connected : ",new Date());
-    return Todo.findById(1);
-  }).then((todo) => {
-    console.log(todo.toJSON())
+    console.log("database connected : ", new Date());
   })
+
   .catch((error) => {
     console.log("error: Todo not found");
   });
