@@ -14,7 +14,7 @@
     "express": "^4.17.1",
     "pg": "^8.0.3",
     "pg-hstore": "^2.3.3",
-    "sequelize": "^5.21.7",
+    "sequelize": "^3.5.1",
     "sqlite3": "^4.2.0",
     "underscore": "^1.10.2"
   }
