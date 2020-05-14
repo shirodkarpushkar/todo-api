@@ -175,7 +175,7 @@ app.put("/todos/:id", middleware.requireAuthentication, (req, res) => {
     );
 });
 
-db.sequelize.sync({ force: true }).then(() => {
+db.sequelize.sync().then(() => {
   console.log("DATABASE CONNECTED:" + new Date());
   app.listen(PORT, () => {
     console.log("listening to PORT:", PORT);

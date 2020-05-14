@@ -78,14 +78,16 @@ module.exports = function (sequelize, DataTypes) {
           return new Promise((resolve, reject) => {
             try {
               var decryptedToken = jwt.verify(token, "qwerty123");
-              var bytes = crypto.AES.decrypt(decryptedToken, "abc123");
-              var tokenData = bytes.toString(crypto.enc.Utf8);
+              var bytes = crypto.AES.decrypt(decryptedToken.token, "abc123");
+              console.log("findByToken -> bytes", bytes);
+              var tokenData = JSON.parse(bytes.toString(crypto.enc.Utf8));
+            
               User.findById(tokenData.id).then(
                 (user) => {
                   if (user) {
                     resolve(user);
                   } else {
-                    reject()
+                    reject();
                   }
                 },
                 (err) => {
