@@ -92,7 +92,7 @@ app.post("/todos", middleware.requireAuthentication, (req, res) => {
 
 app.post("/users", (req, res) => {
   var body = _.pick(req.body, "email", "password");
-  db.users
+  db.user
     .create({
       email: body.email.trim(),
       password: body.password,
@@ -113,7 +113,7 @@ app.post("/users", (req, res) => {
 app.post("/users/login", (req, res) => {
   var body = _.pick(req.body, "email", "password");
 
-  db.users
+  db.user
     .authenticate(body)
     .then((user) => {
       return res
@@ -183,8 +183,8 @@ app.put("/todos/:id", middleware.requireAuthentication, (req, res) => {
     );
 });
 
-db.todo.belongsTo(user);
-db.user.hasMany(todo);
+db.todo.belongsTo(db.user);
+db.user.hasMany(db.todo);
 db.sequelize.sync({ force: true }).then(() => {
   console.log("DATABASE CONNECTED:" + new Date());
   app.listen(PORT, () => {
