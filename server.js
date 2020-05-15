@@ -17,7 +17,9 @@ app.get("/", (req, res) => {
 app.get("/todos", middleware.requireAuthentication, (req, res) => {
   var queryParams = req.query;
 
-  var where = {};
+  var where = {
+    userId: req.user.id,
+  };
 
   if (
     queryParams.hasOwnProperty("completed") &&
@@ -39,8 +41,7 @@ app.get("/todos", middleware.requireAuthentication, (req, res) => {
       [db.Op.like]: `%${queryParams.search}%`,
     };
   }
-  db.Todo
-    .findAll({ where })
+  db.Todo.findAll({ where })
     .then((todos) => {
       res.json(todos);
     })
@@ -52,8 +53,11 @@ app.get("/todos", middleware.requireAuthentication, (req, res) => {
 // get all todos by id
 app.get("/todos/:id", middleware.requireAuthentication, (req, res) => {
   var todoId = parseInt(req.params.id, 10);
-  db.Todo
-    .findById(todoId)
+  db.Todo.findOne({
+    where: {
+      userId: req.user.get('id'),
+      id:todoId
+  }})
     .then((todo) => {
       if (!!todo) {
         res.json(todo.toJSON());
@@ -86,7 +90,6 @@ app.post("/todos", middleware.requireAuthentication, function (req, res) {
     }
   );
 });
-
 
 app.post("/users", (req, res) => {
   var body = _.pick(req.body, "email", "password");
@@ -126,12 +129,11 @@ app.post("/users/login", (req, res) => {
 // add item to array
 app.delete("/todos/:id", middleware.requireAuthentication, (req, res) => {
   var todoId = parseInt(req.params.id, 10);
-  db.Todo
-    .destroy({
-      where: {
-        id: todoId,
-      },
-    })
+  db.Todo.destroy({
+    where: {
+      id: todoId,
+    },
+  })
     .then((rowsDeleted) => {
       if (rowsDeleted) {
         res.json({ success: "Item deleted successfully!" });
@@ -157,8 +159,7 @@ app.put("/todos/:id", middleware.requireAuthentication, (req, res) => {
     attributes.description = body.description;
   }
 
-  db.Todo
-    .findById(todoId)
+  db.Todo.findById(todoId)
     .then(
       (todo) => {
         if (todo) {
