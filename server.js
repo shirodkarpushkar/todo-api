@@ -2,7 +2,7 @@ var express = require("express");
 var bodyparser = require("body-parser");
 var _ = require("underscore");
 var db = require("./db");
-var middleware = require('./middleware')(db)
+var middleware = require("./middleware")(db);
 var bcrypt = require("bcrypt");
 
 var PORT = process.env.PORT || 3000;
@@ -76,7 +76,14 @@ app.post("/todos", middleware.requireAuthentication, (req, res) => {
       completed: body.completed,
     })
     .then((todo) => {
-      res.json(todo);
+      req.user
+        .addtodo(todo)
+        .then((todo) => {
+          return todo.reload();
+        })
+        .then((todo) => {
+          res.json(todo);
+        });
     })
     .catch((err) => {
       res.status(400).json(err);
@@ -102,6 +109,7 @@ app.post("/users", (req, res) => {
       res.status(500).json(err);
     });
 });
+
 app.post("/users/login", (req, res) => {
   var body = _.pick(req.body, "email", "password");
 
@@ -175,7 +183,9 @@ app.put("/todos/:id", middleware.requireAuthentication, (req, res) => {
     );
 });
 
-db.sequelize.sync().then(() => {
+db.todo.belongsTo(user);
+db.user.hasMany(todo);
+db.sequelize.sync({ force: true }).then(() => {
   console.log("DATABASE CONNECTED:" + new Date());
   app.listen(PORT, () => {
     console.log("listening to PORT:", PORT);
