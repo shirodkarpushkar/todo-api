@@ -5,7 +5,6 @@ module.exports = function (db) {
 
       db.user.findByToken(token).then(
         (user) => {
-          console.log("middle ware user", user);
           req.user = user;
           next();
         },

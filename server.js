@@ -39,7 +39,7 @@ app.get("/todos", middleware.requireAuthentication, (req, res) => {
       [db.Op.like]: `%${queryParams.search}%`,
     };
   }
-  db.todo
+  db.Todo
     .findAll({ where })
     .then((todos) => {
       res.json(todos);
@@ -52,7 +52,7 @@ app.get("/todos", middleware.requireAuthentication, (req, res) => {
 // get all todos by id
 app.get("/todos/:id", middleware.requireAuthentication, (req, res) => {
   var todoId = parseInt(req.params.id, 10);
-  db.todo
+  db.Todo
     .findById(todoId)
     .then((todo) => {
       if (!!todo) {
@@ -70,20 +70,17 @@ app.get("/todos/:id", middleware.requireAuthentication, (req, res) => {
 app.post("/todos", middleware.requireAuthentication, (req, res) => {
   var body = _.pick(req.body, "description", "completed");
 
-  db.todo
+  db.Todo
     .create({
       description: body.description.trim(),
       completed: body.completed,
     })
     .then((todo) => {
-      req.user
-        .addtodo(todo)
-        .then((todo) => {
-          return todo.reload();
-        })
-        .then((todo) => {
-          res.json(todo);
-        });
+      req.user.addTodo(todo).then((todo) => {
+        return todo.reload()
+      }).then((todo) => {
+        res.json(todo)
+      });
     })
     .catch((err) => {
       res.status(400).json(err);
@@ -128,7 +125,7 @@ app.post("/users/login", (req, res) => {
 // add item to array
 app.delete("/todos/:id", middleware.requireAuthentication, (req, res) => {
   var todoId = parseInt(req.params.id, 10);
-  db.todo
+  db.Todo
     .destroy({
       where: {
         id: todoId,
@@ -159,7 +156,7 @@ app.put("/todos/:id", middleware.requireAuthentication, (req, res) => {
     attributes.description = body.description;
   }
 
-  db.todo
+  db.Todo
     .findById(todoId)
     .then(
       (todo) => {
@@ -183,9 +180,7 @@ app.put("/todos/:id", middleware.requireAuthentication, (req, res) => {
     );
 });
 
-db.todo.belongsTo(db.user);
-db.user.hasMany(db.todo);
-db.sequelize.sync({ force: true }).then(() => {
+db.sequelize.sync().then(() => {
   console.log("DATABASE CONNECTED:" + new Date());
   app.listen(PORT, () => {
     console.log("listening to PORT:", PORT);
