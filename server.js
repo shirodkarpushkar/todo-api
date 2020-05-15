@@ -67,25 +67,26 @@ app.get("/todos/:id", middleware.requireAuthentication, (req, res) => {
 });
 
 // add item to array
-app.post("/todos", middleware.requireAuthentication, (req, res) => {
+app.post("/todos", middleware.requireAuthentication, function (req, res) {
   var body = _.pick(req.body, "description", "completed");
 
-  db.Todo
-    .create({
-      description: body.description.trim(),
-      completed: body.completed,
-    })
-    .then((todo) => {
-      req.user.addTodo(todo).then((todo) => {
-        return todo.reload()
-      }).then((todo) => {
-        res.json(todo)
-      });
-    })
-    .catch((err) => {
-      res.status(400).json(err);
-    });
+  db.Todo.create(body).then(
+    function (todo) {
+      req.user
+        .addTodo(todo)
+        .then(function () {
+          return todo.reload();
+        })
+        .then(function (todo) {
+          res.json(todo.toJSON());
+        });
+    },
+    function (e) {
+      res.status(400).json(e);
+    }
+  );
 });
+
 
 app.post("/users", (req, res) => {
   var body = _.pick(req.body, "email", "password");
