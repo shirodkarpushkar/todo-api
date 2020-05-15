@@ -55,9 +55,10 @@ app.get("/todos/:id", middleware.requireAuthentication, (req, res) => {
   var todoId = parseInt(req.params.id, 10);
   db.Todo.findOne({
     where: {
-      userId: req.user.get('id'),
-      id:todoId
-  }})
+      userId: req.user.get("id"),
+      id: todoId,
+    },
+  })
     .then((todo) => {
       if (!!todo) {
         res.json(todo.toJSON());
@@ -132,6 +133,7 @@ app.delete("/todos/:id", middleware.requireAuthentication, (req, res) => {
   db.Todo.destroy({
     where: {
       id: todoId,
+      userId: req.user.get("id"),
     },
   })
     .then((rowsDeleted) => {
@@ -159,7 +161,7 @@ app.put("/todos/:id", middleware.requireAuthentication, (req, res) => {
     attributes.description = body.description;
   }
 
-  db.Todo.findById(todoId)
+  db.Todo.findOne({ where: { id: todoId, userId: req.user.get("id") } })
     .then(
       (todo) => {
         if (todo) {
