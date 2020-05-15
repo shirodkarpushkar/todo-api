@@ -19,19 +19,30 @@ var Todo = sequelize.define("todo", {
     defaultValue: false,
   },
 });
-var users = sequelize.define("user", {
+var user = sequelize.define("user", {
   email: {
     type: Sequelize.STRING,
   },
 });
 
-Todo.belongsTo(users);
-users.hasMany(Todo);
+Todo.belongsTo(user);
+user.hasMany(Todo);
 
 sequelize
-  .sync({ force: true })
+  .sync()
   .then(() => {
     console.log("database connected : ", new Date());
+    user.findById(1).then((user) => {
+      user
+        .getTodos({
+          where: {
+            completed: false,
+          },
+        })
+        .then((todo) => {
+          todo.forEach((todo)=> console.log(todo.toJSON()))
+        });
+    });
   })
 
   .catch((error) => {
